@@ -1,0 +1,57 @@
+name: Auto Move Project Cards
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    types: [opened, reopened, synchronize]
+  issues:
+    types: [opened, closed, reopened]
+
+jobs:
+  move-cards:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Move task to In Progress on PR
+        if: github.event_name == 'pull_request' && (github.event.action == 'opened' || github.event.action == 'reopened')
+        uses: alex-page/github-project-automation-plus@v0.9.0
+        with:
+          project: AI Financial Manager
+          column: In Progress
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Move task to Done on merge
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: alex-page/github-project-automation-plus@v0.9.0
+        with:
+          project: AI Financial Manager
+          column: Done
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check for task completion keywords
+        if: github.event_name == 'push'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const commitMessage = context.payload.head_commit.message.toLowerCase();
+            const keywords = ['closes #', 'fixes #', 'resolves #', 'complete task #'];
+            
+            // Extract task number from commit message
+            const taskMatch = commitMessage.match(/(closes|fixes|resolves|complete task)\s*#(\d+)/i);
+            
+            if (taskMatch) {
+              const taskNumber = taskMatch[2];
+              console.log(`Task #${taskNumber} marked as complete`);
+              
+              // Comment on the issue
+              if (context.payload.head_commit) {
+                github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: parseInt(taskNumber),
+                  body: `✅ Task completed in commit: ${context.payload.head_commit.sha.substring(0, 7)}\n\nCommit message: ${commitMessage}`
+                });
+              }
+            }
