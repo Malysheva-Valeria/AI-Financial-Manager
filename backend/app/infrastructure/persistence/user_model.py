@@ -3,11 +3,14 @@ SQLModel User - ORM model for database.
 Separate from domain entity (Dependency Inversion Principle).
 """
 from datetime import datetime, timezone
-from typing import Optional
-from sqlmodel import SQLModel, Field, Column
+from typing import Optional, List, TYPE_CHECKING
+from sqlmodel import SQLModel, Field, Column, Relationship
 from sqlalchemy import String, Enum as SQLEnum, DateTime
 from pydantic import EmailStr, field_validator
 import enum
+
+if TYPE_CHECKING:
+    from app.infrastructure.persistence.transaction_model import TransactionModel
 
 
 class TrackingModeEnum(str, enum.Enum):
@@ -93,6 +96,12 @@ class UserModel(SQLModel, table=True):
         default_factory=lambda: datetime.now(timezone.utc),
         sa_column=Column(DateTime(timezone=True), nullable=False),
         description="Last update timestamp (UTC)"
+    )
+
+    # Relationships
+    transactions: List["TransactionModel"] = Relationship(
+        back_populates="user",
+        sa_relationship_kwargs={"cascade": "all, delete-orphan"}
     )
 
     # Pydantic Validators
