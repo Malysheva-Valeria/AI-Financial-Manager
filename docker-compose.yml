@@ -37,6 +37,7 @@ services:
       - "8000:8000"
     volumes:
       - ./backend/app:/app/app  # Hot reload for development
+      - ./backend/tests:/app/tests  # Mount tests directory
     networks:
       - finance_network
     healthcheck:
