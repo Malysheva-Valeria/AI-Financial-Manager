@@ -7,6 +7,7 @@ from app.infrastructure.persistence.transaction_model import (
     TransactionSourceEnum,
     BudgetCategoryEnum
 )
+from app.infrastructure.persistence.budget_model import BudgetModel
 
 __all__ = [
     "UserModel",
@@ -14,5 +15,6 @@ __all__ = [
     "TransactionModel",
     "TransactionTypeEnum",
     "TransactionSourceEnum",
-    "BudgetCategoryEnum"
+    "BudgetCategoryEnum",
+    "BudgetModel"
 ]

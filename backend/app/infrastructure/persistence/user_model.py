@@ -11,6 +11,7 @@ import enum
 
 if TYPE_CHECKING:
     from app.infrastructure.persistence.transaction_model import TransactionModel
+    from app.infrastructure.persistence.budget_model import BudgetModel
 
 
 class TrackingModeEnum(str, enum.Enum):
@@ -100,6 +101,10 @@ class UserModel(SQLModel, table=True):
 
     # Relationships
     transactions: List["TransactionModel"] = Relationship(
+        back_populates="user",
+        sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+    )
+    budgets: List["BudgetModel"] = Relationship(
         back_populates="user",
         sa_relationship_kwargs={"cascade": "all, delete-orphan"}
     )
