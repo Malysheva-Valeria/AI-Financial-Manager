@@ -90,3 +90,22 @@ xcuserdata/
 *.pem
 *.key
 secrets/
+
+# Testing
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.hypothesis/
+*.cover
+.cache
+nosetests.xml
+coverage.xml
+*.coveragerc
+test_*.db
+test_*.sqlite3
+.testmondata
+
+# Alembic
+alembic/versions/__pycache__/
