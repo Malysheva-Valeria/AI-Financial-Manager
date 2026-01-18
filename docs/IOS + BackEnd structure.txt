@@ -1,0 +1,526 @@
+﻿
+# iOS STRUCTURE - SOLID & MVVM + Clean Architecture
+
+
+ios-app/
+│
+├── FinanceApp/                          # Main App Target
+│   ├── FinanceAppApp.swift              # @main App Entry
+│   ├── Info.plist
+│   │
+│   ├── Core/                            # Core infrastructure
+│   │   ├── DependencyInjection/
+│   │   │   ├── DIContainer.swift        # Dependency injection container
+│   │   │   ├── AppAssembly.swift        # Service registration
+│   │   │   └── Resolver.swift           # Dependency resolver
+│   │   │
+│   │   ├── Configuration/
+│   │   │   ├── AppConfig.swift          # App configuration
+│   │   │   ├── APIConfig.swift          # API endpoints
+│   │   │   └── FeatureFlags.swift       # Feature toggles
+│   │   │
+│   │   └── Extensions/
+│   │       ├── Date+Extensions.swift
+│   │       ├── String+Extensions.swift
+│   │       └── View+Extensions.swift
+│   │
+│   ├── Domain/                          # Domain layer (business logic)
+│   │   ├── Entities/                    # Business entities (pure Swift)
+│   │   │   ├── User.swift
+│   │   │   ├── Transaction.swift
+│   │   │   ├── Budget.swift
+│   │   │   └── Category.swift
+│   │   │
+│   │   ├── ValueObjects/                # Immutable value objects
+│   │   │   ├── Money.swift              # Amount + Currency
+│   │   │   ├── TrackingMode.swift       # Enum: Auto/Manual
+│   │   │   └── BudgetCategory.swift     # Enum: Needs/Wants/Savings
+│   │   │
+│   │   ├── Protocols/                   # Interfaces (Dependency Inversion)
+│   │   │   ├── Repositories/
+│   │   │   │   ├── UserRepositoryProtocol.swift
+│   │   │   │   ├── TransactionRepositoryProtocol.swift
+│   │   │   │   └── BudgetRepositoryProtocol.swift
+│   │   │   │
+│   │   │   └── Services/
+│   │   │       ├── AuthServiceProtocol.swift
+│   │   │       ├── NetworkServiceProtocol.swift
+│   │   │       ├── StorageServiceProtocol.swift
+│   │   │       └── AIAdvisorProtocol.swift
+│   │   │
+│   │   └── UseCases/                    # Business use cases (Single Responsibility)
+│   │       ├── Auth/
+│   │       │   ├── LoginUseCase.swift
+│   │       │   ├── RegisterUseCase.swift
+│   │       │   └── LogoutUseCase.swift
+│   │       │
+│   │       ├── Transactions/
+│   │       │   ├── FetchTransactionsUseCase.swift
+│   │       │   ├── CreateTransactionUseCase.swift
+│   │       │   ├── DeleteTransactionUseCase.swift
+│   │       │   └── SyncTransactionsUseCase.swift
+│   │       │
+│   │       ├── Budget/
+│   │       │   ├── CalculateBudgetUseCase.swift
+│   │       │   ├── GetSafeToSpendUseCase.swift
+│   │       │   └── UpdateBudgetUseCase.swift
+│   │       │
+│   │       └── Advisor/
+│   │           ├── ValidatePurchaseUseCase.swift
+│   │           └── GetAIAdviceUseCase.swift
+│   │
+│   ├── Data/                            # Data layer (implementations)
+│   │   ├── Network/
+│   │   │   ├── Core/
+│   │   │   │   ├── APIClient.swift      # Generic API client
+│   │   │   │   ├── NetworkError.swift   # Error types
+│   │   │   │   ├── RequestBuilder.swift # Request construction
+│   │   │   │   └── ResponseHandler.swift
+│   │   │   │
+│   │   │   ├── Endpoints/               # Endpoint definitions
+│   │   │   │   ├── AuthEndpoint.swift
+│   │   │   │   ├── TransactionEndpoint.swift
+│   │   │   │   ├── BudgetEndpoint.swift
+│   │   │   │   └── AdvisorEndpoint.swift
+│   │   │   │
+│   │   │   └── DTOs/                    # Data Transfer Objects
+│   │   │       ├── AuthDTO.swift
+│   │   │       ├── TransactionDTO.swift
+│   │   │       └── BudgetDTO.swift
+│   │   │
+│   │   ├── Repositories/                # Repository implementations
+│   │   │   ├── UserRepository.swift     # Implements UserRepositoryProtocol
+│   │   │   ├── TransactionRepository.swift
+│   │   │   └── BudgetRepository.swift
+│   │   │
+│   │   ├── LocalStorage/
+│   │   │   ├── CoreData/
+│   │   │   │   ├── CoreDataStack.swift
+│   │   │   │   ├── Entities/
+│   │   │   │   │   ├── UserEntity+CoreDataClass.swift
+│   │   │   │   │   └── TransactionEntity+CoreDataClass.swift
+│   │   │   │   └── FinanceModel.xcdatamodeld
+│   │   │   │
+│   │   │   └── UserDefaults/
+│   │   │       ├── UserDefaultsManager.swift
+│   │   │       └── UserDefaultsKeys.swift
+│   │   │
+│   │   └── Security/
+│   │       ├── KeychainManager.swift    # Secure storage
+│   │       └── BiometricAuthManager.swift
+│   │
+│   ├── Presentation/                    # Presentation layer (UI)
+│   │   ├── Common/                      # Shared UI components
+│   │   │   ├── ViewModifiers/
+│   │   │   │   ├── LoadingModifier.swift
+│   │   │   │   └── ErrorAlertModifier.swift
+│   │   │   │
+│   │   │   ├── Components/
+│   │   │   │   ├── CustomButton.swift
+│   │   │   │   ├── CustomTextField.swift
+│   │   │   │   ├── LoadingView.swift
+│   │   │   │   └── EmptyStateView.swift
+│   │   │   │
+│   │   │   └── Styles/
+│   │   │       ├── ButtonStyles.swift
+│   │   │       ├── TextFieldStyles.swift
+│   │   │       └── Colors.swift
+│   │   │
+│   │   ├── Scenes/                      # MVVM Scenes
+│   │   │   ├── Onboarding/
+│   │   │   │   ├── Views/
+│   │   │   │   │   ├── OnboardingView.swift
+│   │   │   │   │   ├── ModeSelectionView.swift
+│   │   │   │   │   └── MonobankSetupView.swift
+│   │   │   │   ├── ViewModels/
+│   │   │   │   │   └── OnboardingViewModel.swift
+│   │   │   │   └── Coordinator/
+│   │   │   │       └── OnboardingCoordinator.swift
+│   │   │   │
+│   │   │   ├── Auth/
+│   │   │   │   ├── Views/
+│   │   │   │   │   ├── LoginView.swift
+│   │   │   │   │   └── RegisterView.swift
+│   │   │   │   └── ViewModels/
+│   │   │   │       ├── LoginViewModel.swift   # Delegates to LoginUseCase
+│   │   │   │       └── RegisterViewModel.swift
+│   │   │   │
+│   │   │   ├── Dashboard/
+│   │   │   │   ├── Views/
+│   │   │   │   │   ├── DashboardView.swift
+│   │   │   │   │   ├── TransactionListView.swift
+│   │   │   │   │   ├── TransactionRowView.swift
+│   │   │   │   │   └── AddTransactionSheet.swift
+│   │   │   │   ├── ViewModels/
+│   │   │   │   │   ├── DashboardViewModel.swift
+│   │   │   │   │   └── TransactionListViewModel.swift
+│   │   │   │   └── Components/
+│   │   │   │       ├── BalanceCardView.swift
+│   │   │   │       └── SafeToSpendCardView.swift
+│   │   │   │
+│   │   │   ├── Budget/
+│   │   │   │   ├── Views/
+│   │   │   │   │   ├── BudgetView.swift
+│   │   │   │   │   └── BudgetSetupView.swift
+│   │   │   │   ├── ViewModels/
+│   │   │   │   │   └── BudgetViewModel.swift
+│   │   │   │   └── Components/
+│   │   │   │       ├── CategoryProgressView.swift
+│   │   │   │       └── BudgetChartView.swift
+│   │   │   │
+│   │   │   ├── Advisor/
+│   │   │   │   ├── Views/
+│   │   │   │   │   ├── AdvisorView.swift
+│   │   │   │   │   └── ChatBubbleView.swift
+│   │   │   │   ├── ViewModels/
+│   │   │   │   │   └── AdvisorViewModel.swift
+│   │   │   │   └── Components/
+│   │   │   │       ├── MessageRowView.swift
+│   │   │   │       └── InputBarView.swift
+│   │   │   │
+│   │   │   └── Settings/
+│   │   │       ├── Views/
+│   │   │       │   ├── SettingsView.swift
+│   │   │       │   ├── ProfileView.swift
+│   │   │       │   └── TrackingModeView.swift
+│   │   │       └── ViewModels/
+│   │   │           └── SettingsViewModel.swift
+│   │   │
+│   │   └── Navigation/
+│   │       ├── AppCoordinator.swift     # Main navigation coordinator
+│   │       ├── TabBarCoordinator.swift
+│   │       └── NavigationRouter.swift
+│   │
+│   └── Resources/
+│       ├── Assets.xcassets/
+│       ├── Localizable.strings          # Localization
+│       └── Fonts/
+│
+├── FinanceWidget/                        # Widget Extension
+│   ├── FinanceWidget.swift
+│   ├── FinanceWidgetBundle.swift
+│   │
+│   ├── Data/
+│   │   ├── WidgetDataProvider.swift     # Implements data fetching
+│   │   └── WidgetRepository.swift
+│   │
+│   ├── Domain/
+│   │   ├── WidgetEntry.swift            # Widget data model
+│   │   └── WidgetConfiguration.swift
+│   │
+│   └── Presentation/
+│       ├── TimelineProvider.swift       # Widget timeline provider
+│       └── Views/
+│           ├── WidgetEntryView.swift
+│           ├── SmallWidgetView.swift
+│           ├── MediumWidgetView.swift
+│           └── LargeWidgetView.swift
+│
+├── Shared/                               # Shared between targets
+│   ├── AppGroup.swift
+│   ├── SharedKeychain.swift
+│   └── SharedModels/
+│       └── WidgetData.swift
+│
+└── FinanceAppTests/
+    ├── DomainTests/
+    │   └── UseCaseTests/
+    │       ├── LoginUseCaseTests.swift
+    │       └── FetchTransactionsUseCaseTests.swift
+    │
+    ├── DataTests/
+    │   └── RepositoryTests/
+    │       └── TransactionRepositoryTests.swift
+    │
+    ├── PresentationTests/
+    │   └── ViewModelTests/
+    │       ├── LoginViewModelTests.swift
+    │       └── DashboardViewModelTests.swift
+    │
+    └── Mocks/
+        ├── MockUserRepository.swift
+        ├── MockNetworkService.swift
+        └── MockData.swift
+
+
+# SOLID PRINCIPLES EXPLANATION:
+
+
+## Single Responsibility Principle (SRP):
+- ViewModels: Only handle view logic, delegate to use cases
+- Use Cases: Each handles ONE business operation
+- Repositories: Only handle data persistence
+- Views: Only render UI, no business logic
+
+
+## Open/Closed Principle (OCP):
+- Protocol-based design allows extension without modification
+- New repositories can be added without changing use cases
+- New network services can be added without changing ViewModels
+
+
+## Liskov Substitution Principle (LSP):
+- Any implementation of UserRepositoryProtocol can replace another
+- MockUserRepository can replace real repository in tests
+- TransactionRepository can be swapped without breaking code
+
+
+## Interface Segregation Principle (ISP):
+- Small, focused protocols (AuthServiceProtocol, NetworkServiceProtocol)
+- Clients only depend on methods they actually use
+- No fat interfaces
+
+
+## Dependency Inversion Principle (DIP):
+- ViewModels depend on protocols, not concrete implementations
+- Use cases depend on repository protocols
+- High-level modules don't depend on low-level modules
+
+
+# ARCHITECTURE LAYERS:
+
+
+1. PRESENTATION (Views + ViewModels)
+   - SwiftUI Views
+   - ViewModels (observable objects)
+   ↓ depends on ↓
+
+
+2. DOMAIN (Business Logic)
+   - Entities (pure Swift structs)
+   - Use Cases (business operations)
+   - Protocols (interfaces)
+   ↓ depends on ↓
+
+
+3. DATA (Implementations)
+   - Repositories (implement domain protocols)
+   - Network layer
+   - Local storage
+
+
+# MVVM PATTERN:
+View ← binds to → ViewModel → delegates to → Use Case → uses → Repository
+
+
+# DEPENDENCY INJECTION:
+- All dependencies injected via initializers
+- DIContainer manages object creation
+- No singletons (except for truly global state)
+
+
+# TESTABILITY:
+- Protocol-based design enables easy mocking
+- Use cases can be tested in isolation
+- ViewModels tested with mock use cases
+- Repository implementations tested with mock network
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# BACKEND STRUCTURE - SOLID & Clean Architecture
+
+
+finance-manager/backend/
+│
+├── app/
+│   ├── __init__.py
+│   ├── main.py                          # Application entry, dependency injection setup
+│   │
+│   ├── core/                            # Core infrastructure (Dependency Inversion)
+│   │   ├── __init__.py
+│   │   ├── config.py                    # Settings (Single Responsibility)
+│   │   ├── security.py                  # Security utilities
+│   │   ├── database.py                  # DB engine setup
+│   │   └── exceptions.py                # Custom exceptions
+│   │
+│   ├── domain/                          # Domain layer (business logic, framework-independent)
+│   │   ├── __init__.py
+│   │   │
+│   │   ├── entities/                    # Business entities (Plain Python classes)
+│   │   │   ├── __init__.py
+│   │   │   ├── user.py                  # User entity
+│   │   │   ├── transaction.py           # Transaction entity
+│   │   │   └── budget.py                # Budget entity
+│   │   │
+│   │   ├── value_objects/               # Immutable value objects
+│   │   │   ├── __init__.py
+│   │   │   ├── money.py                 # Money value object (amount + currency)
+│   │   │   ├── tracking_mode.py         # Enum for AUTO/MANUAL
+│   │   │   └── budget_category.py       # Enum for NEEDS/WANTS/SAVINGS
+│   │   │
+│   │   └── interfaces/                  # Abstract interfaces (Dependency Inversion)
+│   │       ├── __init__.py
+│   │       ├── repositories.py          # IUserRepository, ITransactionRepository
+│   │       ├── ai_service.py            # IAIAdvisor interface
+│   │       ├── payment_gateway.py       # IPaymentGateway (for Monobank)
+│   │       └── notification_service.py  # INotificationService
+│   │
+│   ├── application/                     # Application layer (use cases)
+│   │   ├── __init__.py
+│   │   │
+│   │   ├── use_cases/                   # Business use cases (Single Responsibility)
+│   │   │   ├── __init__.py
+│   │   │   │
+│   │   │   ├── auth/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── register_user.py     # RegisterUserUseCase
+│   │   │   │   ├── login_user.py        # LoginUserUseCase
+│   │   │   │   └── refresh_token.py     # RefreshTokenUseCase
+│   │   │   │
+│   │   │   ├── transactions/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── create_transaction.py      # CreateTransactionUseCase
+│   │   │   │   ├── list_transactions.py       # ListTransactionsUseCase
+│   │   │   │   ├── sync_bank_transactions.py  # SyncBankTransactionsUseCase
+│   │   │   │   └── categorize_transaction.py  # CategorizeTransactionUseCase
+│   │   │   │
+│   │   │   ├── budget/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── create_budget.py           # CreateBudgetUseCase
+│   │   │   │   ├── calculate_safe_spend.py    # CalculateSafeSpendUseCase
+│   │   │   │   └── apply_50_30_20_rule.py     # Apply503020RuleUseCase
+│   │   │   │
+│   │   │   └── advisor/
+│   │   │       ├── __init__.py
+│   │   │       ├── validate_purchase.py       # ValidatePurchaseUseCase
+│   │   │       └── generate_advice.py         # GenerateAdviceUseCase
+│   │   │
+│   │   ├── dto/                         # Data Transfer Objects
+│   │   │   ├── __init__.py
+│   │   │   ├── auth_dto.py
+│   │   │   ├── transaction_dto.py
+│   │   │   └── budget_dto.py
+│   │   │
+│   │   └── services/                    # Application services (orchestrators)
+│   │       ├── __init__.py
+│   │       ├── transaction_service.py   # Orchestrates transaction use cases
+│   │       ├── budget_service.py        # Orchestrates budget calculations
+│   │       └── user_service.py          # Orchestrates user operations
+│   │
+│   ├── infrastructure/                  # Infrastructure layer (implementations)
+│   │   ├── __init__.py
+│   │   │
+│   │   ├── repositories/                # Repository implementations (Dependency Inversion)
+│   │   │   ├── __init__.py
+│   │   │   ├── sqlalchemy_user_repo.py        # SQLAlchemy User repository
+│   │   │   ├── sqlalchemy_transaction_repo.py # SQLAlchemy Transaction repository
+│   │   │   └── sqlalchemy_budget_repo.py      # SQLAlchemy Budget repository
+│   │   │
+│   │   ├── external/                    # External service implementations
+│   │   │   ├── __init__.py
+│   │   │   ├── gemini_ai_service.py     # Google Gemini implementation
+│   │   │   ├── monobank_gateway.py      # Monobank API implementation
+│   │   │   └── push_notification_service.py   # Push notifications
+│   │   │
+│   │   ├── persistence/                 # ORM models (separate from domain)
+│   │   │   ├── __init__.py
+│   │   │   ├── user_model.py            # SQLModel User
+│   │   │   ├── transaction_model.py     # SQLModel Transaction
+│   │   │   └── budget_model.py          # SQLModel Budget
+│   │   │
+│   │   └── security/                    # Security implementations
+│   │       ├── __init__.py
+│   │       ├── jwt_handler.py           # JWT token management
+│   │       ├── password_hasher.py       # Bcrypt password hashing
+│   │       └── encryption_handler.py    # Fernet encryption
+│   │
+│   ├── presentation/                    # Presentation layer (API)
+│   │   ├── __init__.py
+│   │   │
+│   │   ├── api/
+│   │   │   ├── __init__.py
+│   │   │   ├── dependencies.py          # FastAPI dependencies
+│   │   │   │
+│   │   │   └── v1/
+│   │   │       ├── __init__.py
+│   │   │       ├── router.py            # Main router aggregator
+│   │   │       │
+│   │   │       ├── endpoints/           # API endpoints (thin controllers)
+│   │   │       │   ├── __init__.py
+│   │   │       │   ├── auth.py          # Auth endpoints (delegate to use cases)
+│   │   │       │   ├── users.py         # User endpoints
+│   │   │       │   ├── transactions.py  # Transaction endpoints
+│   │   │       │   ├── budgets.py       # Budget endpoints
+│   │   │       │   ├── advisor.py       # AI advisor endpoints
+│   │   │       │   └── webhooks.py      # Webhook receivers
+│   │   │       │
+│   │   │       └── schemas/             # Pydantic request/response schemas
+│   │   │           ├── __init__.py
+│   │   │           ├── auth_schema.py
+│   │   │           ├── transaction_schema.py
+│   │   │           ├── budget_schema.py
+│   │   │           └── common.py        # Common schemas (pagination, etc.)
+│   │   │
+│   │   └── middleware/
+│   │       ├── __init__.py
+│   │       ├── error_handler.py
+│   │       ├── logging_middleware.py
+│   │       └── rate_limiter.py
+│   │
+│   └── shared/                          # Shared utilities
+│       ├── __init__.py
+│       ├── logger.py
+│       ├── validators.py
+│       └── helpers.py
+
+
+# SOLID PRINCIPLES EXPLANATION:
+
+
+## Single Responsibility Principle (SRP):
+- Each use case class has ONE reason to change (one business operation)
+- Repositories only handle data persistence
+- Services only orchestrate use cases
+- Endpoints only handle HTTP concerns
+
+
+## Open/Closed Principle (OCP):
+- Interfaces allow extension without modification
+- New payment gateways can be added without changing existing code
+- New AI providers can be added by implementing IAIAdvisor
+
+
+## Liskov Substitution Principle (LSP):
+- All repository implementations can replace their interfaces
+- GeminiAIService can be replaced with OpenAIService without breaking code
+
+
+## Interface Segregation Principle (ISP):
+- Small, focused interfaces (IUserRepository, ITransactionRepository)
+- Clients don't depend on methods they don't use
+
+
+## Dependency Inversion Principle (DIP):
+- High-level modules (use cases) depend on abstractions (interfaces)
+- Low-level modules (repositories) implement abstractions
+- Infrastructure layer separated from business logic
+
+
+# LAYERED ARCHITECTURE:
+
+
+1. PRESENTATION (API) - HTTP concerns, validation, serialization
+   ↓ depends on ↓
+2. APPLICATION (Use Cases) - Business workflows, orchestration
+   ↓ depends on ↓
+3. DOMAIN (Entities) - Core business rules, pure Python
+   ↑ implemented by ↑
+4. INFRASTRUCTURE (Implementations) - DB, external services, frameworks
+
+
+# DEPENDENCY FLOW:
+Outer layers → Inner layers
+Infrastructure → Domain (implements interfaces)
+Application → Domain (uses interfaces)
+Presentation → Application (calls use cases)
